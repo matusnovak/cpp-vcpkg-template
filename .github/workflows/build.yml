@@ -141,8 +141,12 @@ jobs:
         id: git_log
         shell: bash
         run: |
-          last_tag=$(git describe --tags --abbrev=0 @^)
-          text=$(git log --oneline --format="%C(auto) %h %s" ${last_tag}..@)
+          last_tag=$(git describe --tags --abbrev=0 @^ || true)
+          if [ -z "$last_tag" ]; then
+            text=$(git log --oneline --format="%C(auto) %h %s")
+          else
+            text=$(git log --oneline --format="%C(auto) %h %s" ${last_tag}..@)
+          fi
           text="${text//'%'/'%25'}"
           text="${text//$'\n'/'%0A'}"
           text="${text//$'\r'/'%0D'}"
