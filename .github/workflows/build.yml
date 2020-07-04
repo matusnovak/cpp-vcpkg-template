@@ -103,6 +103,10 @@ jobs:
             cmake --build ./build --target install --config MinSizeRel
           fi
 
+      - name: Tests
+        shell: bash
+        run: cd build && ctest -C MinSizeRel --verbose
+
       - name: List runtime dependencies
         shell: bash
         run: |
