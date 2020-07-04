@@ -10,7 +10,7 @@ on:
       - 'master'
 
 jobs:
-  build_and_test:
+  build:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -148,51 +148,20 @@ jobs:
             text=$(git log --oneline --format="%C(auto) %h %s" ${last_tag}..@)
           fi
           echo $text
-          text="${text//'%'/'%25'}"
           text="${text//$'\n'/'%0A'}"
           text="${text//$'\r'/'%0D'}"
           echo "::set-output name=log::$text"
 
-      - name: Get release name
-        id: get_release_name
-        if: startsWith(github.ref, 'refs/tags/')
-        shell: bash
-        run: echo "::set-output name=tag::$(git describe --abbrev=0)"
-
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: ncipollo/release-action@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
+          artifact: ${{ steps.create_artifact.outputs.path }}
+          allowUpdates: true
+          artifactContentType: application/zip
           body: ${{ steps.create_changelog.outputs.log }}
-          files: ${{ steps.create_artifact.outputs.path }}
           draft: false
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
           prerelease: false
-          name: Release ${{ steps.get_release_name.outputs.tag }}
-          tag_name: ${{ steps.get_release_name.outputs.tag }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-
-#      - name: Create Release
-#        if: startsWith(github.ref, 'refs/tags/v')
-#        id: create_release
-#        uses: actions/create-release@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-#        with:
-#          tag_name: ${{ github.ref }}
-#          release_name: Release ${{ github.ref }}
-#          body: ${{ steps.git_log.outputs.log }}
-#          draft: false
-#          prerelease: false
-#
-#      - name: Upload Release Asset
-#        if: startsWith(github.ref, 'refs/tags/v')
-#        id: upload-release-asset 
-#        uses: actions/upload-release-asset@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-#          asset_path: ${{ steps.create_artifact.outputs.path }}
-#          asset_name: ${{ steps.create_artifact.outputs.name }}
-#          asset_content_type: application/zip
+          token: ${{ secrets.GITHUB_TOKEN }}
