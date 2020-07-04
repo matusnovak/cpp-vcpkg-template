@@ -137,31 +137,38 @@ jobs:
           path: release
 
       - name: Create Changelog
+        id: create_changelog
         if: startsWith(github.ref, 'refs/tags/v')
         shell: bash
         run: |
           last_tag=$(git describe --tags --abbrev=0 @^ || true)
           if [ -z "$last_tag" ]; then
-            git log --oneline --format="%C(auto) %h %s" > changelog.txt
+            text=$(git log --oneline --format="%C(auto) %h %s")
           else
-            git log --oneline --format="%C(auto) %h %s" ${last_tag}..@ > changelog.txt
+            text=$(git log --oneline --format="%C(auto) %h %s" ${last_tag}..@)
           fi
-          cat changelog.txt
-#          text="${text//'%'/'%25'}"
-#          text="${text//$'\n'/'%0A'}"
-#          text="${text//$'\r'/'%0D'}"
-#          echo "::set-output name=log::$text"
+          echo $text
+          text="${text//'%'/'%25'}"
+          text="${text//$'\n'/'%0A'}"
+          text="${text//$'\r'/'%0D'}"
+          echo "::set-output name=log::$text"
+
+      - name: Get release name
+        id: get_release_name
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: echo "::set-output name=tag::$(git describe --abbrev=0)"
 
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          body_path: changelog.txt
+          body: ${{ steps.create_changelog.outputs.log }}
           files: ${{ steps.create_artifact.outputs.path }}
           draft: false
           prerelease: false
-          name: Release ${{ github.ref }}
-          tag_name: ${{ github.ref }}
+          name: Release ${{ steps.get_release_name.outputs.tag }}
+          tag_name: ${{ steps.get_release_name.outputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
 
