@@ -11,31 +11,35 @@ on:
 
 jobs:
   build_and_test:
-    name: ${{ matrix.triplet }}
+    name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: windows-latest
+          - name: 'Windows x64'
+            os: windows-latest
             triplet: x64-windows
             vcpkg_dir: 'C:\vcpkg'
             suffix: 'windows-win32'
             generator: 'Visual Studio 16 2019'
             arch: '-A x64'
-          - os: windows-latest
+          - name: 'Windows x86'
+            os: windows-latest
             triplet: x86-windows
             vcpkg_dir: 'C:\vcpkg'
             suffix: 'windows-win64'
             generator: 'Visual Studio 16 2019'
             arch: '-A Win32'
-          - os: ubuntu-latest
+          - name: 'Linux x64'
+            os: ubuntu-latest
             triplet: x64-linux
             suffix: 'linux-x86_64'
             vcpkg_dir: '/usr/local/share/vcpkg'
             generator: 'Unix Makefiles'
             arch: ''
-          - os: macos-latest
+          - name: 'Mac OSX x64'
+            os: macos-latest
             triplet: x64-osx
             suffix: 'osx-x86_64'
             vcpkg_dir: '/usr/local/share/vcpkg'
@@ -99,7 +103,7 @@ jobs:
             cmake --build ./build --target install --config MinSizeRel
           fi
 
-      - name: LDD
+      - name: List runtime dependencies
         shell: bash
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
