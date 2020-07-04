@@ -1,6 +1,6 @@
 # C++ Vcpkg template with GitHub actions
 
-![build](https://github.com/matusnovak/cpp-vcpkg-template/workflows/build/badge.svg)
+[![build](https://github.com/matusnovak/cpp-vcpkg-template/workflows/build/badge.svg)](https://github.com/matusnovak/cpp-vcpkg-template/actions)
 
 This is a minimum working template project for C++ with vcpkg and GitHub actions. This template uses the minimum amount of configuration to create a working C++ project out of the box. You don't need to configure anything (just rename `example` occurances to whatever you want), it just works.
 
