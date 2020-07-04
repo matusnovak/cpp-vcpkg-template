@@ -76,7 +76,7 @@ jobs:
               -G "${{ matrix.generator }}" ${{ matrix.arch }} \
               -DCMAKE_INSTALL_PREFIX=./install \
               -DCMAKE_BUILD_TYPE=MinSizeRel \
-              -DDOXYBOOK_TESTS=ON \
+              -DEXAMPLE_TESTS=ON \
               -DCMAKE_TOOLCHAIN_FILE=${{ matrix.vcpkg_dir }}/scripts/buildsystems/vcpkg.cmake \
               .
           else
@@ -89,7 +89,7 @@ jobs:
               -G "${{ matrix.generator }}" \
               -DCMAKE_INSTALL_PREFIX=./install \
               -DCMAKE_BUILD_TYPE=MinSizeRel \
-              -DDOXYBOOK_TESTS=ON \
+              -DEXAMPLE_TESTS=ON \
               -DCMAKE_TOOLCHAIN_FILE=${{ matrix.vcpkg_dir }}/scripts/buildsystems/vcpkg.cmake \
               .
           fi
