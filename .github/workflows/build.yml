@@ -113,6 +113,7 @@ jobs:
           fi
 
       - name: Package
+        id: create_artifact
         shell: bash
         run: |
           mkdir release
@@ -124,10 +125,49 @@ jobs:
             zip -r ./../example.zip *
             cd ..
           fi
-          mv -v ./example.zip ./release/example-${{ matrix.suffix }}-$(git describe --always).zip
+          name=example-${{ matrix.suffix }}-$(git describe --always).zip
+          mv -v ./example.zip release/${name}
+          echo "::set-output name=name::${name}"
+          echo "::set-output name=path::release/${name}"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v1
         with:
           name: Release
           path: release
+
+      - name: Get Changelog
+        id: git_log
+        shell: bash
+        run: |
+          last_tag=$(git describe --tags --abbrev=0 @^)
+          text=$(git log --oneline --format="%C(auto) %h %s" ${last_tag}..@)
+          text="${text//'%'/'%25'}"
+          text="${text//$'\n'/'%0A'}"
+          text="${text//$'\r'/'%0D'}"
+          echo "::set-output name=log::$text"
+
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: ${{ steps.git_log.outputs.log }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        if: startsWith(github.ref, 'refs/tags/v')
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ${{ steps.create_artifact.outputs.path }}
+          asset_name: ${{ steps.create_artifact.outputs.name }}
+          asset_content_type: application/zip
