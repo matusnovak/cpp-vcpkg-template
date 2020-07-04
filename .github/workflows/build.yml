@@ -143,15 +143,11 @@ jobs:
         run: |
           last_tag=$(git describe --tags --abbrev=0 @^ || true)
           if [ -z "$last_tag" ]; then
-            text=$(git log --oneline --format="%C(auto) %h %s")
+            git log --oneline --format="%C(auto) %h %s" > changelog.txt
           else
-            text=$(git log --oneline --format="%C(auto) %h %s" ${last_tag}..@)
+            git log --oneline --format="%C(auto) %h %s" ${last_tag}..@ > changelog.txt
           fi
-          echo $text
-          text="${text//'%'/'%25'}"
-          text="${text//$'\n'/'%0A'}"
-          text="${text//$'\r'/'%0D'}"
-          echo "::set-output name=log::$text"
+          cat changelog.txt
 
       - name: Release
         uses: ncipollo/release-action@v1
@@ -160,7 +156,7 @@ jobs:
           artifact: ${{ steps.create_artifact.outputs.path }}
           allowUpdates: true
           artifactContentType: application/zip
-          body: ${{ steps.create_changelog.outputs.log }}
+          bodyFile: changelog.txt
           draft: false
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true
