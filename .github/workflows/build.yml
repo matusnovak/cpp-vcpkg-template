@@ -137,6 +137,7 @@ jobs:
           path: release
 
       - name: Get Changelog
+        if: startsWith(github.ref, 'refs/tags/v')
         id: git_log
         shell: bash
         run: |
