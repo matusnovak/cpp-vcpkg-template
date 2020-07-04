@@ -1,0 +1,9 @@
+build*/
+temp/
+install/
+out/
+.vscode/
+.vs/
+*.kdev4
+*~
+*.zip
