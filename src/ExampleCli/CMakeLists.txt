@@ -18,7 +18,7 @@ execute_process(
 if(NOT VERSION)
   set(VERSION "v1.0.0")
 endif()
-message("Setting ExampleCli version to: ${VERSION}")
+message("Setting ${PROJECT_NAME}Cli version to: ${VERSION}")
 target_compile_definitions(${PROJECT_NAME}Cli PRIVATE VERSION=${VERSION})
 
 # Install target
