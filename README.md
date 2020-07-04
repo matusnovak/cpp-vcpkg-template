@@ -16,10 +16,6 @@ This is a minimum working template project for C++ with vcpkg and GitHub actions
 * Releases are packaged with `bin`, `include`, and `lib` folders that contain their respective files. The `bin` contains the binary created in the `src/ExampleCli` folder. The `include` folder contains the `include` directory. The `lib` folder contains the static library created in `src/Example`.
 * Testing via Catch2
 
-**What does not work properly:**
-
-* Multiline commit logs on GitHub releases. They are put into a single line.
-
 ## F.A.Q
 
 #### _How do I use this?_
