@@ -52,6 +52,20 @@ jobs:
         with:
           submodules: true
 
+#      # Enable this if you want specific version of vcpkg
+#      # For example tag "2020.06"
+#      - name: Configure Vcpkg
+#        shell: bash
+#        run: |
+#          cd ${{ matrix.vcpkg_dir }}
+#          git fetch origin --tags
+#          git reset --hard 2020.06
+#          if [ "$RUNNER_OS" == "Windows" ]; then
+#            ./bootstrap-vcpkg.bat
+#          else
+#            ./bootstrap-vcpkg.sh
+#          fi
+
       - name: Cache vcpkg
         uses: actions/cache@v2
         with:
